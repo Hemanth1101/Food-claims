@@ -1,83 +1,73 @@
 
-# Netflix Movie Duration Analysis
+# Food Claims Process Analysis
 
 ## Overview
-This project explores trends in Netflix movie durations from 2011 to 2020. The analysis investigates whether movie lengths have been declining over time and examines the impact of genres like Children, Documentaries, and Stand-Up on average durations.
+This project analyzes food poisoning claims filed against Vivendo, a fast-food chain in Brazil. The goal is to understand how different locations handle claims and identify trends in claim processing times.
+
+## Dataset
+The dataset contains 2000 rows, each representing a claim. Key columns include:
+- **Claim ID**: Unique identifier.
+- **Time to Close**: Days taken to close the claim.
+- **Claim Amount**: Initial claim value (BRL).
+- **Amount Paid**: Final amount paid (BRL).
+- **Location**: Claim location (RECIFE, SAO LUIS, FORTALEZA, NATAL).
+- **Individuals on Claim**: Number of individuals involved.
+- **Linked Cases**: Whether the claim is linked to other cases (True/False).
+- **Cause**: Cause of food poisoning (vegetable, meat, unknown).
 
 ## Steps
 
-1. **Loading Data into a Dictionary**  
-   - Created a dictionary `movie_dict` with `years` and `durations` lists.  
-   ```python
-   movie_dict = {"years": [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020],
-                 "durations": [103, 101, 99, 100, 100, 95, 95, 96, 93, 90]}
-   ```
+### 1. **Data Inspection**
+- Checked for missing values, duplicates, and data types.
+- Identified issues:
+  - `claim_amount` had unwanted characters (e.g., "R$").
+  - `amount_paid` and `linked_cases` had missing values.
 
-2. **Creating a DataFrame**  
-   - Converted the dictionary into a pandas DataFrame.  
-   ```python
-   durations_df = pd.DataFrame(movie_dict)
-   ```
+### 2. **Data Cleaning**
+- Removed "R$" from `claim_amount` and converted it to numeric.
+- Filled missing values:
+  - `amount_paid` and `claim_amount` with their medians.
+  - `linked_cases` with "False".
+  - `cause` with "unknown".
+- Created new columns:
+  - `months_to_close`: Categorized `time_to_close` into months.
 
-3. **Visual Inspection**  
-   - Plotted a line graph to visualize the trend in movie durations over time.  
-   ```python
-   plt.plot(durations_df['years'], durations_df['durations'])
-   plt.title("Netflix Movie Durations 2011-2020")
-   plt.show()
-   ```
+### 3. **Sanity Check**
+- Verified no missing values or duplicates remained.
+- Ensured data types matched descriptions.
 
-4. **Loading Full Dataset**  
-   - Loaded the full Netflix dataset from a CSV file.  
-   ```python
-   netflix_df = pd.read_csv("datasets/netflix_data.csv")
-   ```
+### 4. **Data Exploration**
+#### a. **Claims by Location**
+- Created a pie chart to visualize claim distribution across locations.
+- **Insights**:
+  - RECIFE had the most claims (44.25%).
+  - NATAL had the fewest claims (14.35%).
 
-5. **Filtering for Movies**  
-   - Subsetted the DataFrame to include only movies and selected relevant columns.  
-   ```python
-   netflix_movies_col_subset = netflix_df[netflix_df['type'] == "Movie"][["title", "country", "genre", "release_year", "duration"]]
-   ```
+#### b. **Time to Close Distribution**
+- Plotted a histogram and bar chart to analyze claim closure times.
+- **Insights**:
+  - Most claims (81.55%) were closed within 8 months.
+  - 946 claims were closed within 6 months.
 
-6. **Creating a Scatter Plot**  
-   - Visualized movie durations by release year using a scatter plot.  
-   ```python
-   plt.scatter(netflix_movies_col_subset['release_year'], netflix_movies_col_subset['duration'])
-   plt.title("Movie Duration by Year of Release")
-   plt.show()
-   ```
+#### c. **Time to Close vs. Location**
+- Used a box plot to compare closure times across locations.
+- **Insights**:
+  - SAO LUIS had the most outliers, indicating complex claims.
+  - NATAL had the fastest closure times.
 
-7. **Analyzing Short Movies**  
-   - Filtered for movies with durations under 60 minutes and examined their genres.  
-   ```python
-   short_movies = netflix_movies_col_subset[netflix_movies_col_subset["duration"] < 60]
-   ```
+## Conclusion
+- **RECIFE** handles the most claims, while **NATAL** processes them the fastest.
+- Most claims are resolved within 8 months, suggesting efficient handling.
+- Further analysis could explore the impact of claim causes and linked cases on processing times.
 
-8. **Marking Non-Feature Films**  
-   - Assigned colors to movies based on genre (Children: red, Documentaries: blue, Stand-Up: green, Others: black).  
-   ```python
-   colors = []
-   for lab, row in netflix_movies_col_subset.iterrows():
-       if row['genre'] == "Children":
-           colors.append("red")
-       elif row['genre'] == "Documentaries":
-           colors.append("blue")
-       elif row['genre'] == "Stand-Up":
-           colors.append("green")
-       else:
-           colors.append("black")
-   ```
+---
 
-9. **Plotting with Color**  
-   - Created a scatter plot with colored genres to visualize trends.  
-   ```python
-   plt.scatter(netflix_movies_col_subset['release_year'], netflix_movies_col_subset['duration'], c=colors)
-   plt.title("Movie Duration by Year of Release (Colored by Genre)")
-   plt.show()
-   ```
+### Visualizations
+1. **Claims by Location (Pie Chart)**  
+   ![Claims by Location](images/claims_by_location.png)
 
-10. **Conclusion**  
-    - Non-typical genres (Children, Documentaries, Stand-Up) are clustered at shorter durations, but further analysis is needed to confirm trends.  
-    ```python
-    are_movies_getting_shorter = "no"
-    ```
+2. **Time to Close Distribution (Histogram)**  
+   ![Time to Close Distribution](images/time_to_close_distribution.png)
+
+3. **Time to Close vs. Location (Box Plot)**  
+   ![Time to Close vs. Location](images/time_to_close_vs_location.png)
